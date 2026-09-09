@@ -1,17 +1,18 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Notes;
 
 use App\Models\Note;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 #[Layout('layouts.app')]
 #[Title('Notizen')]
 class NoteIndex extends Component
 {
-    public array $notes = [];
+    use WithPagination;
 
     public string $search = '';
 
@@ -24,8 +25,8 @@ class NoteIndex extends Component
                 ->orWhere('content', 'like', "%{$this->search}%");
         }
 
-        $this->notes = $query->latest()->paginate(15);
-
-        return view('livewire.note-index');
+        return view('livewire.note-index', [
+            'notes' => $query->latest()->paginate(15)
+        ]);
     }
 }

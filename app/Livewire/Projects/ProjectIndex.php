@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Projects;
 
 use App\Models\Project;
-use App\Services\Contracts\DockerServiceInterface;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -12,7 +11,7 @@ use Livewire\Component;
 #[Title('Projekte')]
 class ProjectIndex extends Component
 {
-    public array $projects = [];
+    public $projects = [];
 
     public function render()
     {

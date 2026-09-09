@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Docker;
 
 use App\Models\Alert;
 use App\Services\Contracts\DockerServiceInterface;
@@ -37,15 +37,22 @@ class ContainerIndex extends Component
         $this->containers = $this->dockerAvailable ? $docker->listContainers(true) : [];
     }
 
-    /** Container nach Filter durchsuchen */
-    public function getContainerProperty(string $property): array
+    public function startContainer(DockerServiceInterface $docker, string $id)
     {
-        $filtered = collect($this->containers)
-            ->filter(fn ($c) => stripos(implode(' ', $c), $this->filter) !== false || stripos($c[$property] ?? '', $this->filter) !== false)
-            ->values()
-            ->all();
+        $docker->startContainer($id);
+        $this->refresh($docker, app(HostMetricsService::class));
+    }
 
-        return $filtered;
+    public function stopContainer(DockerServiceInterface $docker, string $id)
+    {
+        $docker->stopContainer($id);
+        $this->refresh($docker, app(HostMetricsService::class));
+    }
+
+    public function restartContainer(DockerServiceInterface $docker, string $id)
+    {
+        $docker->restartContainer($id);
+        $this->refresh($docker, app(HostMetricsService::class));
     }
 
     public function toggleLogs(string $id)
@@ -62,7 +69,7 @@ class ContainerIndex extends Component
 
     public function render(DockerServiceInterface $docker, HostMetricsService $hostMetrics)
     {
-        $filtered = $this->filter ? $this->getContainerProperty('name') : $this->containers;
+        $filtered = $this->filter ? collect($this->containers)->filter(fn ($c) => stripos(implode(' ', $c), $this->filter) !== false)->values()->all() : $this->containers;
 
         $running = $filtered ? collect($filtered)->filter(fn ($c) => ($c['State'] ?? '') === 'running')->count() : 0;
 

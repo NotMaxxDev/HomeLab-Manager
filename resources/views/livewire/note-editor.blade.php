@@ -8,8 +8,8 @@
     {{-- Markdown Editor --}}
     <div>
         <x-label class="block text-sm font-medium text-surface-700 dark:text-surface-200">{{ __('note.content') }}</x-label>
-        <textarea name="content" rows="10" class="w-full rounded-lg border border-surface-300 bg-white resize-none px-3 py-2 text-surface-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-surface-700 dark:bg-surface-800 dark:text-white wire:model.debounce.content"
-                  placeholder="Inhalt in Markdown (Unterstriche _ für Kursiv, ** für Fett, ``` für Codeblöcke)"></textarea>
+        <textarea wire:model="content" rows="10" class="w-full rounded-lg border border-surface-300 bg-white resize-none px-3 py-2 text-surface-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-surface-700 dark:bg-surface-800 dark:text-white"
+                  placeholder="Inhalt in Markdown"></textarea>
     </div>
 
     {{-- Vorschau --}}
