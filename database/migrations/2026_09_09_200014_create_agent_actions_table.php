@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('agent_actions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('conversation_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('conversation_id')->constrained('chat_conversations')->cascadeOnDelete();
             $table->foreignId('message_id')->nullable()->constrained('chat_messages')->nullOnDelete();
             $table->string('action');
             $table->nullableMorphs('target');
