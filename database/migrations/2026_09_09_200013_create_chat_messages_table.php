@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('chat_messages', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('conversation_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('conversation_id')->constrained('chat_conversations')->cascadeOnDelete();
             $table->string('role'); // user|assistant|system|tool
             $table->longText('content');
             $table->string('model')->nullable();
