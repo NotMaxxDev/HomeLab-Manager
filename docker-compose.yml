@@ -20,6 +20,8 @@ services:
       REDIS_HOST: ${REDIS_HOST:-redis}
     volumes:
       - .:/var/www/html
+      - /var/www/html/vendor
+      - /var/www/html/node_modules
       - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock
       - /proc:/host/proc:ro
 
