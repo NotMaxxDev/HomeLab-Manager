@@ -1,58 +1,137 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🛠️ HomeLab Manager
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**HomeLab Manager** ist eine zentrale Verwaltungsoberfläche für dein Homelab. Es hilft dir beim Verwalten von Docker-Containern, Projekten, Monitoring-Metriken, Notizen, LLM-Integrationen und MCP-Tokens.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## ✨ Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **📊 Dashboard & Monitoring**: Überblick über Server-Metriken (CPU, RAM, Disks) und Docker-Container.
+- **🐳 Docker Container Management**: Verwalte, starte und stoppe deine Docker-Container direkt im Dashboard.
+- **📁 Projektverwaltung**: Gruppiere Container und Dienste in übersichtliche Projekte.
+- **📝 Notizen & Dokumentation**: Halte Server-Konfigurationen und Snippets mit Versionsverlauf fest.
+- **🤖 LLM Agent Integration**: Unterstützung für OpenAI, Anthropic & MCP (Model Context Protocol).
+- **🌐 Mehrsprachig & Themes**: Deutsch & Englisch Unterstützung inkl. Dark Mode.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🚀 Installation
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Du kannst **HomeLab Manager** schnell und einfach über Docker (Docker Compose oder Laravel Sail) oder direkt lokal installieren.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### Option A: Installation via Docker Compose (Empfohlen)
 
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
+#### 1. Repository klonen
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone https://github.com/NotMaxxDev/HomeLab-Manager.git
+cd HomeLab-Manager
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+#### 2. Umgebungsdatei erstellen
+```bash
+cp .env.example .env
+```
 
-## Contributing
+#### 3. Docker Compose starten
+Erstelle eine `docker-compose.yml` (falls noch nicht vorhanden) oder verwende das folgende Standard-Setup:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```yaml
+version: '3.8'
 
-## Code of Conduct
+services:
+  app:
+    image: php:8.4-cli
+    container_name: homelab_manager
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "4000:8000"
+    command: >
+      sh -c "composer install --no-dev --optimize-autoloader &&
+            php artisan key:generate --force &&
+            php artisan migrate --force &&
+            php artisan serve --host=0.0.0.0 --port=8000"
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Starte den Container:
+```bash
+docker compose up -d
+```
 
-## Security Vulnerabilities
+Öffne anschließend im Browser: **`http://localhost:4000`** (oder IP deines Servers).
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+### Option B: Installation via Laravel Sail (Für Entwickler)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Wenn du bereits Docker auf deinem Rechner installiert hast, kannst du Laravel Sail nutzen:
+
+#### 1. Repository klonen & `.env` kopieren
+```bash
+git clone https://github.com/NotMaxxDev/HomeLab-Manager.git
+cd HomeLab-Manager
+cp .env.example .env
+```
+
+#### 2. Abhängigkeiten über Docker installieren
+```bash
+docker run --rm \
+    -u "$(id -u):$(id -g)" \
+    -v "$(pwd):/var/www/html" \
+    -w /var/www/html \
+    laravelsail/php84-app:latest \
+    composer install --ignore-platform-reqs
+```
+
+#### 3. Sail starten & Setup ausführen
+```bash
+./vendor/bin/sail up -d
+./vendor/bin/sail artisan key:generate
+./vendor/bin/sail artisan migrate
+./vendor/bin/sail npm install
+./vendor/bin/sail npm run build
+```
+
+Öffne anschließend **`http://localhost`**.
+
+---
+
+### Option C: Manuelle lokale Installation (ohne Docker)
+
+#### Voraussetzungen
+- PHP >= 8.3 (mit Extensions: `pdo`, `sqlite3`, `mbstring`, `openssl`, `curl`)
+- Composer
+- Node.js & NPM
+
+#### Schritte:
+```bash
+# 1. Klonen
+git clone https://github.com/NotMaxxDev/HomeLab-Manager.git
+cd HomeLab-Manager
+
+# 2. Setup ausführen (Installiert Composer, NPM, Keys & Migrationen)
+composer run-script setup
+
+# 3. Server auf Port 4000 starten
+php artisan serve --port=4000
+```
+
+Öffne **`http://127.0.0.1:4000`** in deinem Browser.
+
+---
+
+## ⚙️ Wichtige Konfigurationen (`.env`)
+
+- **Docker Integration**: Damit HomeLab Manager lokale Docker-Container verwalten kann, muss die App Zugriff auf den Docker-Socket haben (bei Docker Compose durch das Volume `- /var/run/docker.sock:/var/run/docker.sock`).
+- **Datenbank**: Standardmäßig verwendet die Anwendung SQLite (`database/database.sqlite`).
+
+---
+
+## 📜 Lizenz
+
+Dieses Projekt steht unter der [MIT-Lizenz](LICENSE).
