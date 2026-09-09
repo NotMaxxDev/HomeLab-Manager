@@ -1,7 +1,7 @@
 FROM php:8.4-fpm-alpine
 
 # System-Abhängigkeiten und PHP-Extensions installieren
-RUN apk add --no-linux-headers --no-cache \
+RUN apk add --no-cache \
     git \
     curl \
     libpng-dev \
