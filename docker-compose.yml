@@ -1,0 +1,54 @@
+services:
+  app:
+    image: php:8.4-cli
+    container_name: ${APP_NAME:-homelab-manager}
+    restart: unless-stopped
+    working_dir: /var/www/html
+    ports:
+      - "${APP_PORT:-4000}:8000"
+    env_file:
+      - .env
+    environment:
+      APP_ENV: ${APP_ENV:-production}
+      APP_URL: ${APP_URL:-http://localhost:${APP_PORT:-4000}}
+      DB_HOST: ${DB_HOST:-db}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_DATABASE: ${DB_DATABASE:-homelab}
+      DB_USERNAME: ${DB_USERNAME:-homelab}
+      DB_PASSWORD: ${DB_PASSWORD:-homelab_secret}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+    volumes:
+      - .:/var/www/html
+      - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock
+      - /proc:/host/proc:ro
+    command: >
+      sh -c "composer install --no-dev --optimize-autoloader &&
+            php artisan key:generate --force &&
+            php artisan migrate --force &&
+            php artisan serve --host=0.0.0.0 --port=8000"
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: postgres:16-alpine
+    container_name: ${APP_NAME:-homelab-manager}-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-homelab}
+      POSTGRES_USER: ${DB_USERNAME:-homelab}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-homelab_secret}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "${DB_PORT:-5432}:5432"
+
+  redis:
+    image: redis:alpine
+    container_name: ${APP_NAME:-homelab-manager}-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+
+volumes:
+  pgdata:
